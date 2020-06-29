@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+
+    <title>Game</title>
+    {% load static %}
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <link href="{% static 'play/fontawesome-free-5.13.0-web/css/all.css' %}" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="{% static 'play/css/game.css'%}">
+    <link rel="stylesheet" href="https://unpkg.com/metismenu/dist/metisMenu.min.css">
+    <script src="https://unpkg.com/jquery"></script>
+    <script src="https://unpkg.com/metismenu"></script>
+</head>
+
+<body>
+    <div class="navbar">
+        <a class="navbar-brand" href="#">Title</a>
+        <ul class="nav navbar-nav">
+            <li class="active">
+                <a href="#">Home</a>
+            </li>
+            <li>
+                <a href="#">Link</a>
+            </li>
+        </ul>
+    </div>
+    <div class="container">
+
+        <div class="row">
+            <div id="tree" class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+                <ul id="metismenu">
+                    <li class="mm-active">
+                        <a href="#" aria-expanded="true">Menu 1</a>
+                        <ul>
+                            ...
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#" aria-expanded="false">Menu 2</a>
+                        <ul>
+                            ...
+                        </ul>
+                    </li>
+                    ...
+                </ul>
+            </div>
+            <div id="gameMatrix" class="col-xs-9 col-sm-9 col-md-9
+                    col-lg-9">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">0</th>
+                            <th scope="col">1</th>
+                            <th scope="col">2</th>
+                            <th scope="col">3</th>
+                            <th scope="col">4</th>
+                            <th scope="col">5</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr id="0">
+                            <th scope="row">0</th>
+                            <td id="0"></td>
+                            <td id="1"></td>
+                            <td id="2"></td>
+                            <td id="3"></td>
+                            <td id="4"></td>
+                            <td id="5"></td>
+                        </tr>
+                        <tr id="1">
+                            <th scope="row">1</th>
+                            <<td id="0"></td>
+                                <td id="1"></td>
+                                <td id="2"></td>
+                                <td id="3"></td>
+                                <td id="4"></td>
+                                <td id="5"></td>
+                        </tr>
+                        <tr id="2">
+                            <th scope="row">2</th>
+                            <td id="0"></td>
+                            <td id="1"></td>
+                            <td id="2"></td>
+                            <td id="3"></td>
+                            <td id="4"></td>
+                            <td id="5"></td>
+                        </tr>
+                        <tr id="3">
+                            <th scope="row">3</th>
+                            <td id="0"></td>
+                            <td id="1"></td>
+                            <td id="2"></td>
+                            <td id="3"></td>
+                            <td id="4"></td>
+                            <td id="5"></td>
+                        </tr>
+                        <tr id="4">
+                            <th scope="row">4</th>
+                            <td id="0"></td>
+                            <td id="1"></td>
+                            <td id="2"></td>
+                            <td id="3"></td>
+                            <td id="4"></td>
+                            <td id="5"></td>
+                        </tr>
+                        <tr id="5">
+                            <th scope="row">5</th>
+                            <td id="0"></td>
+                            <td id="1"></td>
+                            <td id="2"></td>
+                            <td id="3"></td>
+                            <td id="4"></td>
+                            <td id="5"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+    <script>
+    </script>
+    <script src="{% static 'play/script/game.js'%}"></script>
+</body>
+
+</html>
