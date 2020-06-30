@@ -8,6 +8,7 @@ from django.http import JsonResponse
 state=[State()]
 
 def index(request):
+   state[0] = State()
    return render(request,'pages/play.html')
 
 @csrf_exempt
