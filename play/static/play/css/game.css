@@ -1,0 +1,17 @@
+.wrap-board {
+    height: 480px;
+    width: 480px;
+}
+
+.board {
+    height: 100%;
+    width: 100%;
+}
+
+.cell{
+    height: calc(480px / 6);
+    width: calc(480px / 6);
+    padding: 0 !important;
+    text-align: center;
+    vertical-align: middle !important;
+}
