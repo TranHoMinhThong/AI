@@ -161,7 +161,7 @@ def MaxHuman(state, subroot, depth, maxDepth=3):
         subroot.point = max(subroot.point, newNode.point)
     random.shuffle(subroot.children)
     subroot.children.sort(reverse=True,key=lambda e: e.point)
-    subroot.children=subroot.children
+    subroot.children=subroot.children[:3]
     return subroot.point
 
 
