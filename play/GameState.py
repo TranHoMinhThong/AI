@@ -1,19 +1,35 @@
 import numpy as np
 import copy
 import json
+import random
+from operator import itemgetter
 
 
 class State:
-    def __init__(self, matrix=np.zeros((6, 6)), length=0, freeCell=[(i, j) for i in range(6) for j in range(6)],freeAdjacentCell=set()):
+    def __init__(self, matrix=np.zeros((6, 6)), length=-1, freeCell=[(i, j) for i in range(6) for j in range(6)], freeAdjacentCell=set(), player=1, latestCheckedCell=None):
         #  0: free box
         #  1: human
         # -1: the robot
         self.matrix = matrix
-        self.length = length
+        self.length = length+1
         self.freeCell = freeCell
-        self.freeAdjacentCell=freeAdjacentCell
+        self.freeAdjacentCell = freeAdjacentCell
+        self.latestCheckedCell = latestCheckedCell
+        self.status=0
+        if self.latestCheckedCell and player:
+            self.matrix[self.latestCheckedCell] = player
+            self.freeCell.remove(latestCheckedCell)
+            if latestCheckedCell in self.freeAdjacentCell:
+                self.freeAdjacentCell.remove(latestCheckedCell)
+            u = self.latestCheckedCell[0]
+            v = self.latestCheckedCell[1]
+            addedCell = {(i, j) for i in [u-1,u,u+1] for j in [v-1,v,v+1] if 0 <= i < 6 and 0 <= j < 6 and not(i==u and j==v)}
+            addedCell = {e for e in addedCell if self.matrix[e] == 0}
+            self.freeAdjacentCell = self.freeAdjacentCell | addedCell
+            self.status = self.check(self.latestCheckedCell)
 
     def check(self, cell):
+        
         if self.matrix[cell] == 0:
             return 0
         # check all row, col, diag cotain the cell
@@ -111,22 +127,11 @@ class State:
     def getFreeAdjacentCell(self):
         return self.freeAdjacentCell
 
-
     def tickCell(self, player, cell):
         # player: 1 for the human, -1 for robot
         # cell: tuple
         childState = State(np.copy(self.matrix), self.length,
-                           copy.deepcopy(self.freeCell),copy.deepcopy(self.freeAdjacentCell))
-        childState.matrix[cell] = player
-        childState.length += 1
-        childState.freeCell.remove(cell)
-        if cell in childState.freeAdjacentCell:
-            childState.freeAdjacentCell.remove(cell)
-        u=cell[0]
-        v=cell[1]
-        addedCell={(i,j) for i in [u-2,u-1,u+1,u+2] for j in [v-2,v-1,v+1,v+2] if 0<=i<6 and 0<=j<6 }
-        addedCell={e for e in addedCell if self.matrix[e]==0}
-        childState.freeAdjacentCell=childState.freeAdjacentCell|addedCell
+                           copy.deepcopy(self.freeCell), copy.deepcopy(self.freeAdjacentCell), player, cell)
         return childState
 
 
@@ -141,11 +146,9 @@ class Node:
 
 
 def MaxHuman(state, subroot, depth, maxDepth=3):
-    if not subroot.cell is None:
-        i = state.check(subroot.cell)
-        if not i == 0:
-            subroot.point = i/state.length
-            return subroot.point
+    if not state.status==0:
+        subroot.point=state.status*10
+        return subroot.point
     if depth == maxDepth:
         subroot.point = 0
         return 0
@@ -153,37 +156,43 @@ def MaxHuman(state, subroot, depth, maxDepth=3):
     for freeCell in state.getFreeCell():
         newNode = Node(freeCell)
         newNode.point = MinRobot(
-            state.tickCell(-1, freeCell), newNode, depth+1, maxDepth)
+            state.tickCell(1, freeCell), newNode, depth+1, maxDepth)
         subroot.children.append(newNode)
         subroot.point = max(subroot.point, newNode.point)
+    random.shuffle(subroot.children)
     subroot.children.sort(reverse=True,key=lambda e: e.point)
+    subroot.children=subroot.children
     return subroot.point
 
 
 def MinRobot(state, subroot, depth, maxDepth=3):
-    if not subroot.cell is None:
-        i = state.check(subroot.cell)
-        if not i == 0:
-            subroot.point = i/state.length
-            return subroot.point
+    if not state.status==0:
+        subroot.point=state.status*10
+        return subroot.point
     if depth == maxDepth:
         subroot.point = 0
         return 0
     subroot.point = 999999999999999999
     for freeCell in state.getFreeAdjacentCell():
         newNode = Node(freeCell)
-        newNode.point = MaxHuman(state.tickCell(1,
+        newNode.point = MaxHuman(state.tickCell(-1,
                                                 freeCell), newNode, depth+1, maxDepth)
         subroot.children.append(newNode)
         subroot.point = min(subroot.point, newNode.point)
-    subroot.children=[min(subroot.children,key=lambda e: e.point)]
+    subroot.children = [min(subroot.children, key=lambda e: e.point)]
+    if subroot.point==1:
+        print(subroot.point)
     return subroot.point
 
+
 class result:
-    def __init__(self, status, node=None,robotCell=None):
-        self.status=status
-        self.robotCell=robotCell
-        self.node=node
+    def __init__(self, status, node=None, robotCell=None):
+        self.status = status
+        self.robotCell = robotCell
+        self.node = node
 
     def toJson(self):
         return json.dumps(self, default=lambda o: o.__dict__)
+
+a=State().tickCell(1,(0,2)).tickCell(1,(1,2)).tickCell(1,(2,2)).tickCell(-1,(3,2))
+print(a.status)
