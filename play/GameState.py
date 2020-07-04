@@ -107,7 +107,7 @@ class State:
             i -= 1
             j += 1
         i = cell[0]+1
-        j = cell[0]-1
+        j = cell[1]-1
         s2 = 0
         while 0 <= i < 6 and 0 <= j < 6:
             if self.matrix[i, j] == self.matrix[cell]:
