@@ -75,7 +75,7 @@ $(document).ready(() => {
                             switch (response.status) {
                                 case 1:
                                     console.log('Win');
-                                    $("#result").html("Congration. You Win!");
+                                    $("#result").html("Congratulations. You Win!");
                                     $("#result").css("color", "blue");
                                     break;
                                 case -1:
