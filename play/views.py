@@ -5,16 +5,21 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 # Create your views here.
 
-state = [State()]
-ab = [-9999999999999999999, 9999999999999999999]
+globalState=[]
+ab = [-inf, inf]
 
 
 def index(request):
-    state[0] = State()
-    return render(request, 'pages/play.html')
+	if (not (request.session.get("state", False))) or (request.session["state"] >= len(globalState)):
+		request.session["state"] = len(globalState)
+		globalState.append(State())
+	else:
+		globalState[request.session["state"]] = State()
 
+	return render(request, 'pages/play.html')
 
 @csrf_exempt
 def tickCell(request):
-    if request.method == 'POST':
-        return tickCell_AlphaBetaPrunning(state,request)
+	if request.method == 'POST':
+		index = request.session["state"]
+		return tickCell_AlphaBetaPrunning(globalState, index, request)
