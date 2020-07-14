@@ -1,13 +1,27 @@
 .board {
-    height: 480px;
-    width: 480px;
-    margin-top: 40px;
+  height: 480px;
+  width: 480px;
+  margin-top: 40px;
 }
 
-.cell{
-    height: calc(480px / 6);
-    width: calc(480px / 6);
-    padding: 0 !important;
-    text-align: center;
-    vertical-align: middle !important;
+.miniboard {
+  height: 180px;
+  width: 180px;
+  margin-top: 20px;
+}
+
+.bigcell {
+  height: calc(480px / 6);
+  width: calc(480px / 6);
+  padding: 0 !important;
+  text-align: center;
+  vertical-align: middle !important;
+}
+
+.cell {
+  height: calc(180px / 6);
+  width: calc(180px / 6);
+  padding: 0 !important;
+  text-align: center;
+  vertical-align: middle !important;
 }
