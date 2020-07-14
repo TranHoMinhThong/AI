@@ -2,8 +2,9 @@ var _turn = 0;
 
 function access(i, j) {
   let $element = $(
-    "tr:nth-of-type(" + (i + 1) + ") td:nth-of-type(" + (j + 1) + ")"
+    "tr:nth-of-type(" + (i + 1) + ")  td:nth-of-type(" + (j + 1) + ")"
   );
+  $("big-table tbody tr:nth-of-type(4)").css("backgroundColor", "blue");
   return $element;
 }
 
@@ -47,9 +48,18 @@ $(document).ready(() => {
         let b = j;
         $td.on("click", () => {
           if (_turn % 2 == 0 && !$td.html()) {
-            $td.html(
-              '<i class="far fa-circle fa-3x" aria-hidden="true" style="color:blue"></i>'
-            );
+            $td.each(function (i, item) {
+              console.log(i, item);
+              if (i == 0) {
+                $(item).html(
+                  '<i class="far fa-circle fa-3x" aria-hidden="true" style="color:blue"></i>'
+                );
+              } else {
+                $(item).html(
+                  '<i class="far fa-circle" aria-hidden="true" style="color:blue"></i>'
+                );
+              }
+            });
             _turn++;
             turnName.innerHTML = "Computer";
             turnName.style.color = "red";
@@ -82,9 +92,18 @@ $(document).ready(() => {
                 case -1:
                   i = response.robotCell[0];
                   j = response.robotCell[1];
-                  access(i, j).html(
-                    '<i class="fas fa-times fa-4x" style="color:red;" ></i>'
-                  );
+                  access(i, j).each(function (i, item) {
+                    console.log(i, item);
+                    if (i == 0) {
+                      $(item).html(
+                        '<i class="fas fa-times fa-4x" style="color:red;" ></i>'
+                      );
+                    } else {
+                      $(item).html(
+                        '<i class="fas fa-times fa" style="color:red;" ></i>'
+                      );
+                    }
+                  });
                   console.log("L");
                   $("#result").html("You Lose. Try again!");
                   $("#result").css("color", "red");
@@ -92,9 +111,18 @@ $(document).ready(() => {
                 default:
                   i = response.robotCell[0];
                   j = response.robotCell[1];
-                  access(i, j).html(
-                    '<i class="fas fa-times fa-4x" style="color:red"></i>'
-                  );
+                  access(i, j).each(function (i, item) {
+                    console.log(i, item);
+                    if (i == 0) {
+                      $(item).html(
+                        '<i class="fas fa-times fa-4x" style="color:red;" ></i>'
+                      );
+                    } else {
+                      $(item).html(
+                        '<i class="fas fa-times fa" style="color:red;" ></i>'
+                      );
+                    }
+                  });
                   _turn++;
                   break;
               }
