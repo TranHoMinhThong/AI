@@ -89,7 +89,7 @@ class State:
             i -= 1
             j -= 1
         i = cell[0]+1
-        h = cell[1]+1
+        j = cell[1]+1
         s2 = 0
         while 0 <= i < 6 and 0 <= j < 6:
             if self.matrix[i, j] == self.matrix[cell]:
@@ -139,6 +139,139 @@ class State:
                            copy.deepcopy(self.freeCell), copy.deepcopy(self.freeAdjacentCell), player, cell)
         return childState
 
+    def __numOfBlocks(self, row, column, count, type):
+        '''
+        This function is used by evaluation function to calculate blocks
+        at the begin and the end of consecutive human's moves
+        type: 1 is row, 2 is column, 3 is diagonal from left to right, 4 is diagonal from right to left
+        '''
+        ret = 0
+        if (type == 1):
+            if (column == 6) or (self.matrix[row, column] == -1):
+                ret += 1
+            if (column - count - 1) < 0 or (self.matrix[row, column - count - 1] == -1):
+                ret += 1
+        elif (type == 2):
+            if (row == 6) or (self.matrix[row, column] == -1):
+                ret += 1
+            if (row - count - 1 < 0) or (self.matrix[row - count - 1, column] == -1):
+                ret += 1
+        elif (type == 3):
+            if (row == 6) or (column == 6) or (self.matrix[row, column] == -1):
+                ret += 1
+            if (column - count - 1 < 0) or (row - count - 1 < 0) or (self.matrix[row - count - 1, column - count - 1] == -1):
+                ret += 1
+        elif (type == 4):
+            if (row == 6) or (column < 0) or (self.matrix[row, column] == -1):
+                ret += 1
+            if (row - count - 1 < 0) or (column + count + 1 >= 6) or (self.matrix[row - count - 1, column + count + 1] == -1):
+                ret += 1
+        return ret
+
+    def evaluation(self):
+        numOfMandatoryMoves = 0
+        def updateNumOfMandatoryMoves(row, column, count, type):
+            numOfBlocks = self.__numOfBlocks(row, column, count, type)
+            if count == 2 and numOfBlocks == 0:
+                return 1
+            elif count == 3 and numOfBlocks == 1:
+                return 1
+            elif count == 3 and numOfBlocks == 0:
+                return 2
+            elif count >= 4:
+                return inf
+            return 0
+
+        # check rows
+        for i in range(6):
+            count = 0
+            for j in range(6):
+                if self.matrix[i, j] == 1:
+                    count += 1
+                elif count != 0:    # reach the end of consecutive moves
+                    ret = updateNumOfMandatoryMoves(i, j, count, 1)
+                    if ret == inf:
+                        return inf
+                    else:
+                        numOfMandatoryMoves += ret
+                    count = 0
+            if count != 0:
+                ret = updateNumOfMandatoryMoves(i, 6, count, 1)
+                if ret == inf:
+                    return inf
+                else:
+                    numOfMandatoryMoves += ret
+
+        # check columns
+        for i in range(6):
+            count = 0
+            for j in range(6):
+                if self.matrix[j, i] == 1:
+                    count += 1
+                elif count != 0:    # reach the end of consecutive moves
+                    ret = updateNumOfMandatoryMoves(j, i, count, 2)
+                    if ret == inf:
+                        return inf
+                    else:
+                        numOfMandatoryMoves += ret
+                    count = 0
+            if count != 0:
+                ret = updateNumOfMandatoryMoves(6, i, count, 2)
+                if ret == inf:
+                    return inf
+                else:
+                    numOfMandatoryMoves += ret
+
+        # check diagonal from left to right
+        startPoints = [(2,0), (1,0), (0,0), (0,1), (0,2)]
+        for point in startPoints:
+            i, j = point
+            count = 0
+            while (i < 6 and j < 6):
+                if self.matrix[i, j] == 1:
+                    count += 1
+                elif count != 0:    # reach the end of consecutive moves
+                    ret = updateNumOfMandatoryMoves(i, j, count, 3)
+                    if ret == inf:
+                        return inf
+                    else:
+                        numOfMandatoryMoves += ret
+                    count = 0
+                i += 1
+                j += 1
+            if count != 0:
+                ret = updateNumOfMandatoryMoves(i, j, count, 3)
+                if ret == inf:
+                    return inf
+                else:
+                    numOfMandatoryMoves += ret
+
+        # check diagonal from left to right
+        startPoints = [(1,5), (2,5), (0,3), (0,4), (0,5)]
+        for point in startPoints:
+            i, j = point
+            count = 0
+            while (i < 6 and j >= 0):
+                if self.matrix[i, j] == 1:
+                    count += 1
+                elif count != 0:    # reach the end of consecutive moves
+                    ret = updateNumOfMandatoryMoves(i, j, count, 4)
+                    if ret == inf:
+                        return inf
+                    else:
+                        numOfMandatoryMoves += ret
+                    count = 0
+                i += 1
+                j -= 1
+            if count != 0:
+                ret = updateNumOfMandatoryMoves(i, j, count, 4)
+                if ret == inf:
+                    return inf
+                else:
+                    numOfMandatoryMoves += ret
+
+        return numOfMandatoryMoves * 10**6
+
 
 class Node:
     def __init__(self, cell=None, point=None):
@@ -159,16 +292,15 @@ class result:
         return json.dumps(self, default=lambda o: o.__dict__)
 
 
-def MaxHumanPrunning(state, subroot, depth, ab, maxDepth=2):
+def MaxHumanPrunning(state, subroot, depth, ab, maxDepth=4):
     # ab=[alpha,beta]
     if(state.length==6 and state.latestCheckedCell==(3,3)):
         print('e',state.status)
     if not state.status == 0:
-        subroot.point = state.status*100/state.length
-        return subroot.point
+        return inf if state.status == 1 else -inf
     if depth == maxDepth:
-        subroot.point = 0
-        return 0
+        subroot.point = state.evaluation()
+        return subroot.point
     subroot.point = -inf
     for freeCell in state.getFreeAdjacentCell():
         newNode = Node(freeCell)
@@ -184,14 +316,13 @@ def MaxHumanPrunning(state, subroot, depth, ab, maxDepth=2):
     return subroot.point
 
 
-def MinRobotPrunning(state, subroot, depth, ab, maxDepth=2):
+def MinRobotPrunning(state, subroot, depth, ab, maxDepth=4):
     # ab=[alpha,beta]
     if not state.status == 0:
-        subroot.point = state.status*100/state.length
-        return subroot.point
+        return inf if state.status == 1 else -inf
     if depth == maxDepth:
-        subroot.point = 0
-        return 0
+        subroot.point = state.evaluation()
+        return subroot.point
     subroot.point = inf
     for freeCell in state.getFreeAdjacentCell():
         newNode = Node(freeCell)
