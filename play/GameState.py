@@ -3,6 +3,9 @@ import copy
 import json
 import random
 from operator import itemgetter
+from django.http import JsonResponse
+
+inf = 10**9
 
 
 class State:
@@ -146,47 +149,6 @@ class Node:
     def toJson(self):
         return json.dumps(self, default=lambda o: o.__dict__)
 
-
-def MaxHuman(state, subroot, depth, maxDepth=3):
-    if not state.status == 0:
-        subroot.point = state.status*10
-        return subroot.point
-    if depth == maxDepth:
-        subroot.point = 0
-        return 0
-    subroot.point = -999999999999999999
-    for freeCell in state.getFreeCell():
-        newNode = Node(freeCell)
-        newNode.point = MinRobot(
-            state.tickCell(1, freeCell), newNode, depth+1, maxDepth)
-        subroot.children.append(newNode)
-        subroot.point = max(subroot.point, newNode.point)
-    random.shuffle(subroot.children)
-    subroot.children.sort(reverse=True, key=lambda e: e.point)
-    subroot.children = subroot.children[:3]
-    return subroot.point
-
-
-def MinRobot(state, subroot, depth, maxDepth=3):
-    if not state.status == 0:
-        subroot.point = state.status*10
-        return subroot.point
-    if depth == maxDepth:
-        subroot.point = 0
-        return 0
-    subroot.point = 999999999999999999
-    for freeCell in state.getFreeAdjacentCell():
-        newNode = Node(freeCell)
-        newNode.point = MaxHuman(state.tickCell(-1,
-                                                freeCell), newNode, depth+1, maxDepth)
-        subroot.children.append(newNode)
-        subroot.point = min(subroot.point, newNode.point)
-    subroot.children = [min(subroot.children, key=lambda e: e.point)]
-    if subroot.point == 1:
-        print(subroot.point)
-    return subroot.point
-
-
 class result:
     def __init__(self, status, node=None, robotCell=None):
         self.status = status
@@ -195,3 +157,96 @@ class result:
 
     def toJson(self):
         return json.dumps(self, default=lambda o: o.__dict__)
+
+
+def MaxHumanPrunning(state, subroot, depth, ab, maxDepth=2):
+    # ab=[alpha,beta]
+    if(state.length==6 and state.latestCheckedCell==(3,3)):
+        print('e',state.status)
+    if not state.status == 0:
+        subroot.point = state.status*100/state.length
+        return subroot.point
+    if depth == maxDepth:
+        subroot.point = 0
+        return 0
+    subroot.point = -inf
+    for freeCell in state.getFreeAdjacentCell():
+        newNode = Node(freeCell)
+        newNode.point = MinRobotPrunning(
+            state.tickCell(1, freeCell), newNode, depth+1, ab, maxDepth)
+        subroot.children.append(newNode)
+        subroot.point = max(subroot.point, newNode.point)
+        ab[0] = max(ab[0], subroot.point)
+        if subroot.point >= ab[1] and depth > 0:
+            break
+
+    random.shuffle(subroot.children)
+    subroot.children.sort(reverse=True, key=lambda e: e.point)
+    subroot.children = subroot.children[:3]
+    return subroot.point
+
+
+def MinRobotPrunning(state, subroot, depth, ab, maxDepth=2):
+    # ab=[alpha,beta]
+    if not state.status == 0:
+        subroot.point = state.status*100/state.length
+        return subroot.point
+    if depth == maxDepth:
+        subroot.point = 0
+        return 0
+    subroot.point = inf
+    for freeCell in state.getFreeAdjacentCell():
+        newNode = Node(freeCell)
+        newNode.point = MaxHumanPrunning(state.tickCell(-1,
+                                                        freeCell), newNode, depth+1, ab, maxDepth)
+        subroot.children.append(newNode)
+        subroot.point = min(subroot.point, newNode.point)
+        ab[1] = min(ab[1], subroot.point)
+        if subroot.point <= ab[0] and depth > 0:
+            break
+
+    random.shuffle(subroot.children)
+    subroot.children.sort(reverse=True, key=lambda e: e.point)
+    # if depth==0:
+    #     for e in subroot.children:
+    #         print('a',e.cell,e.point)
+    #         for ec in e.children:
+    #             print('aa',ec.cell, ec.point)
+    subroot.children = [min(subroot.children, key=lambda e: e.point)]
+    return subroot.point
+
+count = 0
+
+def tickCell_AlphaBetaPrunning(state, index, request):
+    global count
+    a = int(request.POST['a'])
+    b = int(request.POST['b'])
+    if (a != -1 and b != -1):
+        count += 1
+        cell = (a, b)
+        print(cell)
+        # check if alresdy win
+        state[index] = state[index].tickCell(1, cell)
+        print(state[index].status)
+        if state[index].status == 1:
+            return JsonResponse(result(status=1).toJson(), safe=False)
+
+        node = Node(cell)
+        ab = [-inf, inf]
+        MinRobotPrunning(state[index], node, 0, ab)
+        cell = node.children[0].cell
+        state[index] = state[index].tickCell(-1, cell)
+        if state[index].status == -1:
+            return JsonResponse(result(status=-1, robotCell=cell).toJson(), safe=False)
+
+        node = Node(cell)
+        ab = [-inf, inf]
+        MaxHumanPrunning(state[index], node, 0, ab)
+        return JsonResponse(result(status=0, robotCell=cell, node=node).toJson(), safe=False)
+    else:
+        state[index] = State()
+        return JsonResponse(result(status=1).toJson(), safe=False)
+#01,20
+
+# a=State().tickCell(1,(0,0)).tickCell(-1,(0,1)).tickCell(1,(1,1)).tickCell(-1,(2,0)).tickCell(1,(2,2)).tickCell(1,(3,3))
+# print(a.status)

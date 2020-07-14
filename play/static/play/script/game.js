@@ -46,7 +46,7 @@ $(document).ready(() => {
         let a = i;
         let b = j;
         $td.on("click", () => {
-          if (_turn % 2 == 0) {
+          if (_turn % 2 == 0 && !$td.html()) {
             $td.html(
               '<i class="far fa-circle fa-3x" aria-hidden="true" style="color:blue"></i>'
             );
