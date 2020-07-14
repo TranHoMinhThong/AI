@@ -177,7 +177,8 @@ class State:
             elif count == 3 and numOfBlocks == 1:
                 return 1
             elif count == 3 and numOfBlocks == 0:
-                return 2
+                # This must be return 2 but adjust this to higher to prioritize this case
+                return 4
             elif count >= 4:
                 return inf
             return 0
@@ -292,7 +293,7 @@ class result:
         return json.dumps(self, default=lambda o: o.__dict__)
 
 
-def MaxHumanPrunning(state, subroot, depth, ab, maxDepth=4):
+def MaxHumanPrunning(state, subroot, depth, ab, maxDepth=2):
     # ab=[alpha,beta]
     if(state.length==6 and state.latestCheckedCell==(3,3)):
         print('e',state.status)
@@ -316,7 +317,7 @@ def MaxHumanPrunning(state, subroot, depth, ab, maxDepth=4):
     return subroot.point
 
 
-def MinRobotPrunning(state, subroot, depth, ab, maxDepth=4):
+def MinRobotPrunning(state, subroot, depth, ab, maxDepth=2):
     # ab=[alpha,beta]
     if not state.status == 0:
         return inf if state.status == 1 else -inf
