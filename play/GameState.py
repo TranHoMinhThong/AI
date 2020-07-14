@@ -180,9 +180,7 @@ def MaxHumanPrunning(state, subroot, depth, ab, maxDepth=2):
         if subroot.point >= ab[1] and depth > 0:
             break
 
-    random.shuffle(subroot.children)
-    subroot.children.sort(reverse=True, key=lambda e: e.point)
-    subroot.children = subroot.children[:3]
+    subroot.children.sort(reverse=False, key=lambda e: e.point)
     return subroot.point
 
 
@@ -205,14 +203,12 @@ def MinRobotPrunning(state, subroot, depth, ab, maxDepth=2):
         if subroot.point <= ab[0] and depth > 0:
             break
 
-    random.shuffle(subroot.children)
-    subroot.children.sort(reverse=True, key=lambda e: e.point)
+    subroot.children.sort(reverse=False, key=lambda e: e.point)
     # if depth==0:
     #     for e in subroot.children:
     #         print('a',e.cell,e.point)
     #         for ec in e.children:
     #             print('aa',ec.cell, ec.point)
-    subroot.children = [min(subroot.children, key=lambda e: e.point)]
     return subroot.point
 
 count = 0
