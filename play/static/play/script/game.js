@@ -4,7 +4,7 @@ function access(i, j) {
   let $element = $(
     "tr:nth-of-type(" + (i + 1) + ")  td:nth-of-type(" + (j + 1) + ")"
   );
-  $("big-table tbody tr:nth-of-type(4)").css("backgroundColor", "blue");
+  // $("big-table tbody tr:nth-of-type(4)").css("backgroundColor", "blue");
   return $element;
 }
 
@@ -39,6 +39,8 @@ $(document).ready(() => {
         $("#result").html("");
       });
     }
+    let tempCell = [];
+    let tempScore = [];
     let i = 0;
     for (i = 0; i < 6; i++) {
       let j = 0;
@@ -48,8 +50,14 @@ $(document).ready(() => {
         let b = j;
         $td.on("click", () => {
           if (_turn % 2 == 0 && !$td.html()) {
+            for(let c=0; c<tempCell.length; c++){
+              let board = $("#board" + c);;
+              console.log(tempCell[c]);
+              let cell = board.find("tr:nth-of-type(" + (tempCell[c][0] + 1) + ")  td:nth-of-type(" + (tempCell[c][1] + 1) + ")");
+              cell.html('');
+            }
             $td.each(function (i, item) {
-              console.log(i, item);
+              // console.log(i, item);
               if (i == 0) {
                 $(item).html(
                   '<i class="far fa-circle fa-3x" aria-hidden="true" style="color:blue"></i>'
@@ -83,6 +91,16 @@ $(document).ready(() => {
                 $("#s-row").html(``);
                 $("#s-col").html(``);
               }
+              tempCell.length = 0;
+              tempScore.length = 0;
+              let numberCase = response.node.children.length > 3 ? 3 : response.node.children.length;
+              for(let c=0; c<numberCase; c++){
+                tempCell.push(response.node.children[c]["cell"]);
+                tempScore.push(response.node.children[c]["score"]);
+                let board = $("#board" + c);;
+                let cell = board.find("tr:nth-of-type(" + (tempCell[c][0] + 1) + ")  td:nth-of-type(" + (tempCell[c][1] + 1) + ")");
+                cell.html('<i class="far fa-circle" aria-hidden="true" style="color:blue"></i>');
+              }
               switch (response.status) {
                 case 1:
                   console.log("Win");
@@ -112,7 +130,7 @@ $(document).ready(() => {
                   i = response.robotCell[0];
                   j = response.robotCell[1];
                   access(i, j).each(function (i, item) {
-                    console.log(i, item);
+                    // console.log(i, item);
                     if (i == 0) {
                       $(item).html(
                         '<i class="fas fa-times fa-4x" style="color:red;" ></i>'
