@@ -11,12 +11,18 @@ function access(i, j) {
 var turnName = document.getElementById("name");
 
 $(document).ready(() => {
-  $("#metismenu").metisMenu();
+  var tempCell = [];
+  var tempScore = [];
   $("#btn-start").on("click", function () {
     if ($("#btn-start").text() == "Start") {
       $("#btn-start").html("Restart");
     } else {
+      $("#btn-start").html("Start");
       _turn = 0;
+      for (let c = 0; c < tempCell.length; c++) {
+        let score = $("#score" + c);
+        score.html("");
+      }
       $.ajax({
         url: "http://127.0.0.1:8000/play/tickCell/",
         type: "POST",
@@ -39,8 +45,6 @@ $(document).ready(() => {
         $("#result").html("");
       });
     }
-    let tempCell = [];
-    let tempScore = [];
     let i = 0;
     for (i = 0; i < 6; i++) {
       let j = 0;
@@ -50,11 +54,16 @@ $(document).ready(() => {
         let b = j;
         $td.on("click", () => {
           if (_turn % 2 == 0 && !$td.html()) {
-            for(let c=0; c<tempCell.length; c++){
-              let board = $("#board" + c);;
-              console.log(tempCell[c]);
-              let cell = board.find("tr:nth-of-type(" + (tempCell[c][0] + 1) + ")  td:nth-of-type(" + (tempCell[c][1] + 1) + ")");
-              cell.html('');
+            for (let c = 0; c < tempCell.length; c++) {
+              let board = $("#board" + c);
+              let cell = board.find(
+                "tr:nth-of-type(" +
+                  (tempCell[c][0] + 1) +
+                  ")  td:nth-of-type(" +
+                  (tempCell[c][1] + 1) +
+                  ")"
+              );
+              cell.html("");
             }
             $td.each(function (i, item) {
               // console.log(i, item);
@@ -81,6 +90,7 @@ $(document).ready(() => {
               },
             }).done((result) => {
               let response = JSON.parse(result);
+              console.log(response);
               turnName.innerHTML = "Player";
               turnName.style.color = "blue";
               if (response.node) {
@@ -93,13 +103,27 @@ $(document).ready(() => {
               }
               tempCell.length = 0;
               tempScore.length = 0;
-              let numberCase = response.node.children.length > 3 ? 3 : response.node.children.length;
-              for(let c=0; c<numberCase; c++){
+              let tempLength = response.node.children ? response.node.children.length : 0;
+              let numberCase =
+                tempLength > 3
+                  ? 3
+                  : tempLength;
+              for (let c = 0; c < numberCase; c++) {
                 tempCell.push(response.node.children[c]["cell"]);
-                tempScore.push(response.node.children[c]["score"]);
-                let board = $("#board" + c);;
-                let cell = board.find("tr:nth-of-type(" + (tempCell[c][0] + 1) + ")  td:nth-of-type(" + (tempCell[c][1] + 1) + ")");
-                cell.html('<i class="far fa-circle" aria-hidden="true" style="color:blue"></i>');
+                tempScore.push(response.node.children[c]["point"]);
+                let board = $("#board" + c);
+                let cell = board.find(
+                  "tr:nth-of-type(" +
+                    (tempCell[c][0] + 1) +
+                    ")  td:nth-of-type(" +
+                    (tempCell[c][1] + 1) +
+                    ")"
+                );
+                let score = $("#score" + c);
+                score.html(tempScore[c]);
+                cell.html(
+                  '<i class="far fa-circle" aria-hidden="true" style="color:blue"></i>'
+                );
               }
               switch (response.status) {
                 case 1:

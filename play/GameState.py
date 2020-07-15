@@ -313,7 +313,7 @@ def MaxHumanPrunning(state, subroot, depth, ab, maxDepth=2):
         if subroot.point >= ab[1] and depth > 0:
             break
 
-    subroot.children.sort(reverse=False, key=lambda e: e.point)
+    subroot.children.sort(reverse=True, key=lambda e: e.point)
     return subroot.point
 
 
