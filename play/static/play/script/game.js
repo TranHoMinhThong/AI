@@ -58,10 +58,10 @@ $(document).ready(() => {
               let board = $("#board" + c);
               let cell = board.find(
                 "tr:nth-of-type(" +
-                  (tempCell[c][0] + 1) +
-                  ")  td:nth-of-type(" +
-                  (tempCell[c][1] + 1) +
-                  ")"
+                (tempCell[c][0] + 1) +
+                ")  td:nth-of-type(" +
+                (tempCell[c][1] + 1) +
+                ")"
               );
               cell.html("");
             }
@@ -114,10 +114,10 @@ $(document).ready(() => {
                 let board = $("#board" + c);
                 let cell = board.find(
                   "tr:nth-of-type(" +
-                    (tempCell[c][0] + 1) +
-                    ")  td:nth-of-type(" +
-                    (tempCell[c][1] + 1) +
-                    ")"
+                  (tempCell[c][0] + 1) +
+                  ")  td:nth-of-type(" +
+                  (tempCell[c][1] + 1) +
+                  ")"
                 );
                 let score = $("#score" + c);
                 score.html(tempScore[c]);
@@ -128,7 +128,7 @@ $(document).ready(() => {
               switch (response.status) {
                 case 1:
                   console.log("Win");
-                  $("#result").html("Congration. You Win!");
+                  $("#result").html("Congratulations. You Win!");
                   $("#result").css("color", "blue");
                   break;
                 case -1:
