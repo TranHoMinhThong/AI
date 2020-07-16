@@ -17,7 +17,6 @@ $(document).ready(() => {
     if ($("#btn-start").text() == "Start") {
       $("#btn-start").html("Restart");
     } else {
-      $("#btn-start").html("Start");
       _turn = 0;
       for (let c = 0; c < tempCell.length; c++) {
         let score = $("#score" + c);
@@ -103,7 +102,7 @@ $(document).ready(() => {
               }
               tempCell.length = 0;
               tempScore.length = 0;
-              let tempLength = response.node.children ? response.node.children.length : 0;
+              let tempLength = response.node ? response.node.children.length : 0;
               let numberCase =
                 tempLength > 3
                   ? 3
