@@ -343,8 +343,80 @@ def MinRobotPrunning(state, subroot, depth, ab, maxDepth=2):
     #             print('aa',ec.cell, ec.point)
     return subroot.point
 
+def MaxHuman(state, subroot, depth, maxDepth=2):
+    # ab=[alpha,beta]
+    if(state.length==6 and state.latestCheckedCell==(3,3)):
+        print('e',state.status)
+    if not state.status == 0:
+        return inf if state.status == 1 else -inf
+    if depth == maxDepth:
+        subroot.point = state.evaluation()
+        return subroot.point
+    subroot.point = -inf
+    for freeCell in state.getFreeAdjacentCell():
+        newNode = Node(freeCell)
+        newNode.point = MinRobot(
+            state.tickCell(1, freeCell), newNode, depth+1, maxDepth)
+        subroot.children.append(newNode)
+        subroot.point = max(subroot.point, newNode.point)
+    subroot.children.sort(reverse=True, key=lambda e: e.point)
+    return subroot.point
+
+
+def MinRobot(state, subroot, depth, maxDepth=2):
+    # ab=[alpha,beta]
+    if not state.status == 0:
+        return inf if state.status == 1 else -inf
+    if depth == maxDepth:
+        subroot.point = state.evaluation()
+        return subroot.point
+    subroot.point = inf
+    for freeCell in state.getFreeAdjacentCell():
+        newNode = Node(freeCell)
+        newNode.point = MaxHuman(state.tickCell(-1,
+                                                        freeCell), newNode, depth+1, maxDepth)
+        subroot.children.append(newNode)
+        subroot.point = min(subroot.point, newNode.point)
+    subroot.children.sort(reverse=False, key=lambda e: e.point)
+    # if depth==0:
+    #     for e in subroot.children:
+    #         print('a',e.cell,e.point)
+    #         for ec in e.children:
+    #             print('aa',ec.cell, ec.point)
+    return subroot.point
+
 count = 0
 
+def tickCell_Minimax(state, request):
+    global count
+    a = int(request.POST['a'])
+    b = int(request.POST['b'])
+    if (a != -1 and b != -1):
+        count += 1
+        cell = (a, b)
+        print(cell)
+        # check if alresdy win
+        state[index] = state[index].tickCell(1, cell)
+        print(state[index].status)
+        if state[index].status == 1:
+            return JsonResponse(result(status=1).toJson(), safe=False)
+
+        node = Node(cell)
+        ab = [-inf, inf]
+        MinRobot(state[index], node, 0)
+        cell = node.children[0].cell
+        state[index] = state[index].tickCell(-1, cell)
+        if state[index].status == -1:
+            return JsonResponse(result(status=-1, robotCell=cell).toJson(), safe=False)
+
+        node = Node(cell)
+        ab = [-inf, inf]
+        MaxHuman(state[index], node, 0)
+        return JsonResponse(result(status=0, robotCell=cell, node=node).toJson(), safe=False)
+    else:
+        state[index] = State()
+        return JsonResponse(result(status=1).toJson(), safe=False)
+    
 def tickCell_AlphaBetaPrunning(state, index, request):
     global count
     a = int(request.POST['a'])
@@ -361,7 +433,8 @@ def tickCell_AlphaBetaPrunning(state, index, request):
 
         node = Node(cell)
         ab = [-inf, inf]
-        MinRobotPrunning(state[index], node, 0, ab)
+        
+        RobotPrunning(state[index], node, 0, ab)
         cell = node.children[0].cell
         state[index] = state[index].tickCell(-1, cell)
         if state[index].status == -1:
