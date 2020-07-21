@@ -22,4 +22,8 @@ def index(request):
 def tickCell(request):
 	if request.method == 'POST':
 		index = request.session["state"]
-		return tickCell_AlphaBetaPrunning(globalState, index, request)
+		if request.POST['mode'] == 0:
+			return tickCell_Minimax(globalState, request)			
+		else:
+			print(1)
+			return tickCell_AlphaBetaPrunning(globalState, index, request)

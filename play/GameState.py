@@ -394,10 +394,8 @@ def tickCell_Minimax(state, request):
     if (a != -1 and b != -1):
         count += 1
         cell = (a, b)
-        print(cell)
         # check if alresdy win
         state[index] = state[index].tickCell(1, cell)
-        print(state[index].status)
         if state[index].status == 1:
             return JsonResponse(result(status=1).toJson(), safe=False)
 
@@ -424,17 +422,15 @@ def tickCell_AlphaBetaPrunning(state, index, request):
     if (a != -1 and b != -1):
         count += 1
         cell = (a, b)
-        print(cell)
         # check if alresdy win
         state[index] = state[index].tickCell(1, cell)
-        print(state[index].status)
         if state[index].status == 1:
             return JsonResponse(result(status=1).toJson(), safe=False)
 
         node = Node(cell)
         ab = [-inf, inf]
         
-        RobotPrunning(state[index], node, 0, ab)
+        MinRobotPrunning(state[index], node, 0, ab)
         cell = node.children[0].cell
         state[index] = state[index].tickCell(-1, cell)
         if state[index].status == -1:

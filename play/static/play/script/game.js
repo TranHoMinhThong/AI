@@ -29,6 +29,7 @@ $(document).ready(() => {
         data: {
           a: -1,
           b: -1,
+          mode: $("input[name = 'mode']:checked").val(),
         },
       }).done(() => {
         let i = 0;
@@ -57,10 +58,10 @@ $(document).ready(() => {
               let board = $("#board" + c);
               let cell = board.find(
                 "tr:nth-of-type(" +
-                (tempCell[c][0] + 1) +
-                ")  td:nth-of-type(" +
-                (tempCell[c][1] + 1) +
-                ")"
+                  (tempCell[c][0] + 1) +
+                  ")  td:nth-of-type(" +
+                  (tempCell[c][1] + 1) +
+                  ")"
               );
               cell.html("");
             }
@@ -86,10 +87,10 @@ $(document).ready(() => {
               data: {
                 a: a,
                 b: b,
+                mode: $("input[name = 'mode']:checked").val(),
               },
             }).done((result) => {
               let response = JSON.parse(result);
-              console.log(response);
               turnName.innerHTML = "Player";
               turnName.style.color = "blue";
               if (response.node) {
@@ -102,21 +103,20 @@ $(document).ready(() => {
               }
               tempCell.length = 0;
               tempScore.length = 0;
-              let tempLength = response.node ? response.node.children.length : 0;
-              let numberCase =
-                tempLength > 3
-                  ? 3
-                  : tempLength;
+              let tempLength = response.node
+                ? response.node.children.length
+                : 0;
+              let numberCase = tempLength > 3 ? 3 : tempLength;
               for (let c = 0; c < numberCase; c++) {
                 tempCell.push(response.node.children[c]["cell"]);
                 tempScore.push(response.node.children[c]["point"]);
                 let board = $("#board" + c);
                 let cell = board.find(
                   "tr:nth-of-type(" +
-                  (tempCell[c][0] + 1) +
-                  ")  td:nth-of-type(" +
-                  (tempCell[c][1] + 1) +
-                  ")"
+                    (tempCell[c][0] + 1) +
+                    ")  td:nth-of-type(" +
+                    (tempCell[c][1] + 1) +
+                    ")"
                 );
                 let score = $("#score" + c);
                 score.html(tempScore[c]);
@@ -134,7 +134,6 @@ $(document).ready(() => {
                   i = response.robotCell[0];
                   j = response.robotCell[1];
                   access(i, j).each(function (i, item) {
-                    console.log(i, item);
                     if (i == 0) {
                       $(item).html(
                         '<i class="fas fa-times fa-4x" style="color:red;" ></i>'
